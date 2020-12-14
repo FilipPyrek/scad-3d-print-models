@@ -11,19 +11,8 @@ bedInnerWidth = bedWidth - bedWallThickness * 2;
 bedInnerDepth = bedDepth - bedWallThickness * 2;
 bedInnerHeight = bedHeight - bedWallThickness;
 
-/* [Siphon Tube] */
-siphonTubeHeight = 8;
-siphonTubeWidth = siphonTubeHeight * 2;
-siphonZ = bedHeight * 0.7 - siphonTubeHeight/2;
-
-siphonFilterWallThickness = 2; 
-siphonFilterWidth = siphonTubeHeight * 2;
-siphonFilterDepth = siphonTubeWidth * 1.5;
-siphonFilterHeight = bedInnerHeight;
-siphonHoleSize = 2;
-
-/* [Intake] */
-intakeWallSpacing = 10;
+/* [Water Intake] */
+intakeXWallSpacing = 10;
 intakeTopD = 8;
 intakeTopHeight = 10;
 intakeTopThickness = 1;
@@ -31,9 +20,32 @@ intakeTopThickness = 1;
 intakeBottomD = 20;
 intakeBottomHeight = 1;
 
-intakeHolderHeight = 2;
-intakeHolderWidth = 1;
-intakeHolderCount = 10; 
+intakeSupportHeight = 2;
+intakeSupportWidth = 1;
+intakeSupportCount = 10; 
+
+/* [Drain] */
+
+drainWallSpacing = 5;
+drainTopD = 8;
+drainTopHeight = 10;
+drainTopThickness = 1;
+
+drainBottomD = 20;
+drainBottomHeight = 1;
+
+drainSupportHeight = 2;
+drainSupportWidth = 1;
+drainSupportCount = 10; 
+
+drainIntakeDistance = 60;
+
+drainFilterWallThickness = 2;
+drainFilterWidth = drainBottomD + drainIntakeDistance + drainWallSpacing * 2 + drainFilterWallThickness;
+drainFilterDepth = drainBottomD + drainWallSpacing * 2;
+drainFilterHeight = bedInnerHeight;
+drainFilterHoleSize = 2;
+
 
 union() {
     difference() {
@@ -55,127 +67,58 @@ union() {
             bedInnerHeight
         ]);
 
-        // Siphon out
+        // Siphon drain hole
+        for(drainIndex = ["drain1","drain2"]) 
         translate([
-            -intakeBottomD/2 + bedWidth - intakeWallSpacing,
-            bedWallThickness + bedInnerDepth / 4,
+            -drainTopD/2 + bedWidth - bedWallThickness - drainWallSpacing,
+            drainIndex == "drain1"
+                ? drainBottomD/2 + bedWallThickness + drainWallSpacing
+                : bedDepth - drainBottomD/2 - bedWallThickness - drainWallSpacing,
             0
         ])
-        cylinder(d=intakeTopD - intakeTopThickness * 2, h = bedWallThickness);
-
-        // Siphon tube hole
-        // translate([
-        //     bedWidth - bedWallThickness,
-        //     bedDepth / 2,
-        //     siphonZ
-        // ])
-        // rotate([
-        //     0,
-        //     90,
-        //     0
-        // ])
-        // resize([siphonTubeHeight, siphonTubeWidth, bedWallThickness])
-        // cylinder();
+        cylinder(d=drainTopD - drainTopThickness * 2, h = bedWallThickness);
     }
 
-    // // Filter
-    // translate([
-    //     bedWidth - siphonFilterWidth - bedWallThickness,
-    //     bedDepth / 2 - siphonFilterDepth / 2,
-    //     bedWallThickness
-    // ])
-    // difference() {
-    //     cube([
-    //         siphonFilterWidth,
-    //         siphonFilterDepth,
-    //         siphonFilterHeight
-    //     ]);
-
-    //     translate([
-    //         siphonFilterWallThickness,
-    //         siphonFilterWallThickness,
-    //         0
-    //     ])
-    //     cube([
-    //         siphonFilterWidth - siphonFilterWallThickness,
-    //         siphonFilterDepth - siphonFilterWallThickness * 2,
-    //         siphonFilterHeight
-    //     ]);
-
-    //     zNumberOfHoles = floor((siphonFilterHeight - siphonFilterWallThickness * 2 )/(siphonHoleSize * 2));
-    //     xNumberOfHoles = floor((siphonFilterWidth - siphonFilterWallThickness * 2 )/(siphonHoleSize * 2));
-    //     yNumberOfHoles = floor((siphonFilterDepth - siphonFilterWallThickness * 2 )/(siphonHoleSize * 2)) - 1;
-
-    //     // X axis holes
-    //     for (zIndex = [0:zNumberOfHoles]) {
-    //         for(xIndex = [0:xNumberOfHoles]) {
-    //             translate([
-    //                 siphonFilterWallThickness + siphonHoleSize * xIndex * 2,
-    //                 0,
-    //                 siphonHoleSize * zIndex * 2,
-    //             ])
-    //             cube([
-    //                 siphonHoleSize,
-    //                 siphonFilterDepth,
-    //                 siphonHoleSize
-    //             ]);
-    //         }
-    //     }
-
-    //     // Y axis holes
-    //     for (zIndex = [0:zNumberOfHoles]) {
-    //         for(yIndex = [0:yNumberOfHoles]) {
-    //             translate([
-    //                 0,
-    //                 siphonFilterWallThickness + siphonHoleSize * yIndex * 2 + siphonHoleSize/2,
-    //                 siphonHoleSize * zIndex * 2,
-    //             ])
-    //             cube([
-    //                 siphonHoleSize,
-    //                 siphonHoleSize,
-    //                 siphonHoleSize
-    //             ]);
-    //         }
-    //     }
-    // }
-
     // Siphon intake
+    for(drainIndex = ["drain1","drain2"])
     translate([
-        -intakeBottomD/2 + bedWidth - intakeWallSpacing,
-        bedWallThickness + bedInnerDepth / 4 * 3,
+        -drainBottomD/2 + bedWidth - bedWallThickness - drainWallSpacing - drainIntakeDistance,
+        drainIndex == "drain1"
+            ? drainBottomD/2 + bedWallThickness + drainWallSpacing
+            : bedDepth - drainBottomD/2 - bedWallThickness - drainWallSpacing,
         bedWallThickness
     ])
     union() {
         difference() {
             union() {
-                for(index = [1:intakeHolderCount]) {
-                    rotate(360/intakeHolderCount * index)
+                for(index = [1:intakeSupportCount]) {
+                    rotate(360/intakeSupportCount * index)
                     translate([
-                        -intakeHolderWidth/2,
+                        -intakeSupportWidth/2,
                         -intakeBottomD / 2,
                         0
                     ])
                     cube([
-                        intakeHolderWidth,
+                        intakeSupportWidth,
                         intakeBottomD,
-                        intakeHolderHeight
+                        intakeSupportHeight
                     ]);
                 }
                 translate([
                     0,
                     0,
-                    intakeHolderHeight 
+                    intakeSupportHeight 
                 ])
                 cylinder(d = intakeBottomD, h = intakeBottomHeight);
             }
 
-            cylinder(d=intakeTopD - intakeTopThickness * 2, h = intakeHolderHeight + intakeBottomHeight);
+            cylinder(d=intakeTopD - intakeTopThickness * 2, h = intakeSupportHeight + intakeBottomHeight);
         }
 
         translate([
             0,
             0,
-            intakeHolderHeight + intakeBottomHeight
+            intakeSupportHeight + intakeBottomHeight
         ])
         difference() {
             cylinder(d=intakeTopD, h = intakeTopHeight);
@@ -184,53 +127,127 @@ union() {
     }
 
     // Siphon drain tube
+    for(drainIndex = ["drain1","drain2"])
     translate([
-            -intakeBottomD/2 + bedWidth - intakeWallSpacing,
-            bedWallThickness + bedInnerDepth / 4,
-            bedWallThickness
+        -drainTopD/2 + bedWidth - bedWallThickness - drainWallSpacing,
+        drainIndex == "drain1"
+            ? drainBottomD/2 + bedWallThickness + drainWallSpacing
+            : bedDepth - drainBottomD/2 - bedWallThickness - drainWallSpacing,
+        bedWallThickness
+    ])
+    difference() {
+        cylinder(d=drainTopD, h = drainTopHeight);
+        cylinder(d=drainTopD - drainTopThickness * 2, h = drainTopHeight);
+    }
+
+    // Siphon filter
+    for(drainIndex = ["drain1","drain2"])
+    translate([
+        bedInnerWidth + bedWallThickness - drainFilterWidth,
+        drainIndex == "drain1"
+            ? bedWallThickness
+            : bedWallThickness + bedInnerDepth - drainFilterDepth,
+        bedWallThickness
+    ])
+    difference() {
+        cube([
+            drainFilterWidth,
+            drainFilterDepth,
+            drainFilterHeight
+        ]);
+
+        translate([
+            drainFilterWallThickness,
+            drainIndex == "drain1"
+                ? 0
+                : drainFilterWallThickness,
+            0
         ])
-        difference() {
-            cylinder(d=intakeTopD, h = intakeTopHeight);
-            cylinder(d=intakeTopD - intakeTopThickness * 2, h = intakeTopHeight);
+        cube([
+            drainFilterWidth - drainFilterWallThickness,
+            drainFilterDepth - drainFilterWallThickness,
+            drainFilterHeight
+        ]);
+
+        zNumberOfHoles = floor((drainFilterHeight - drainFilterWallThickness * 2 )/(drainFilterHoleSize * 2));
+        xNumberOfHoles = floor((drainFilterWidth - drainFilterWallThickness * 2 )/(drainFilterHoleSize * 2));
+        yNumberOfHoles = floor((drainFilterDepth - drainFilterWallThickness * 2 )/(drainFilterHoleSize * 2));
+
+        // X axis holes
+        for (zIndex = [0:zNumberOfHoles]) {
+            for(xIndex = [0:xNumberOfHoles]) {
+                translate([
+                    drainFilterWallThickness + drainFilterHoleSize * xIndex * 2,
+                    0,
+                    drainFilterHoleSize * zIndex * 2,
+                ])
+                cube([
+                    drainFilterHoleSize,
+                    drainFilterDepth,
+                    drainFilterHoleSize
+                ]);
+            }
         }
 
-    // Intake
+        // Y axis holes
+        for (zIndex = [0:zNumberOfHoles]) {
+            for(yIndex = [0:yNumberOfHoles]) {
+                translate([
+                    0,
+                    drainFilterWallThickness + drainFilterHoleSize * yIndex * 2,
+                    drainFilterHoleSize * zIndex * 2,
+                ])
+                cube([
+                    drainFilterWidth,
+                    drainFilterHoleSize,
+                    drainFilterHoleSize
+                ]);
+            }
+        }
+    }
+
+    // Water Intake
     translate([
-        intakeWallSpacing + intakeBottomD/2 + bedWallThickness,
+        intakeXWallSpacing + intakeBottomD/2 + bedWallThickness,
         bedWallThickness + bedInnerDepth /2,
         bedWallThickness
     ])
     union() {
         difference() {
             union() {
-                for(index = [1:intakeHolderCount]) {
-                    rotate(360/intakeHolderCount * index)
+                // Intake supports
+                for(index = [1:intakeSupportCount]) {
+                    rotate(360/intakeSupportCount * index)
                     translate([
-                        -intakeHolderWidth/2,
+                        -intakeSupportWidth/2,
                         -intakeBottomD / 2,
                         0
                     ])
                     cube([
-                        intakeHolderWidth,
+                        intakeSupportWidth,
                         intakeBottomD,
-                        intakeHolderHeight
+                        intakeSupportHeight
                     ]);
                 }
+
+                // Intake bottom cover
                 translate([
                     0,
                     0,
-                    intakeHolderHeight 
+                    intakeSupportHeight 
                 ])
                 cylinder(d = intakeBottomD, h = intakeBottomHeight);
             }
 
-            cylinder(d=intakeTopD - intakeTopThickness * 2, h = intakeHolderHeight + intakeBottomHeight);
+            // Intake tube hole
+            cylinder(d=intakeTopD - intakeTopThickness * 2, h = intakeSupportHeight + intakeBottomHeight);
         }
 
+        // Intake tube
         translate([
             0,
             0,
-            intakeHolderHeight + intakeBottomHeight
+            intakeSupportHeight + intakeBottomHeight
         ])
         difference() {
             cylinder(d=intakeTopD, h = intakeTopHeight);
