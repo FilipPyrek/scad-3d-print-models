@@ -1,5 +1,6 @@
 /* [Render] */
 $fn = 20;
+epsilon = 1;
 
 /* [Bed] */
 bedWidth = 500;
@@ -41,8 +42,8 @@ drainSupportCount = 10;
 drainIntakeDistance = 60;
 
 drainFilterWallThickness = 2;
-drainFilterWidth = drainBottomD + drainIntakeDistance + drainWallSpacing * 2 + drainFilterWallThickness;
-drainFilterDepth = drainBottomD + drainWallSpacing * 2;
+drainFilterWidth = drainBottomD/2 + drainTopD/2 + drainIntakeDistance + drainWallSpacing * 2 + drainFilterWallThickness;
+drainFilterDepth = drainBottomD + drainWallSpacing * 2 + drainFilterWallThickness;
 drainFilterHeight = bedInnerHeight;
 drainFilterHoleSize = 2;
 
@@ -64,25 +65,25 @@ union() {
         cube([
             bedInnerWidth,
             bedInnerDepth,
-            bedInnerHeight
+            bedInnerHeight + epsilon
         ]);
 
         // Siphon drain hole
         for(drainIndex = ["drain1","drain2"]) 
         translate([
-            -drainTopD/2 + bedWidth - bedWallThickness - drainWallSpacing,
+            bedWidth - drainTopD/2 - bedWallThickness - drainWallSpacing,
             drainIndex == "drain1"
                 ? drainBottomD/2 + bedWallThickness + drainWallSpacing
                 : bedDepth - drainBottomD/2 - bedWallThickness - drainWallSpacing,
-            0
+            -epsilon
         ])
-        cylinder(d=drainTopD - drainTopThickness * 2, h = bedWallThickness);
+        cylinder(d=drainTopD - drainTopThickness * 2, h = bedWallThickness + epsilon * 2);
     }
 
     // Siphon intake
     for(drainIndex = ["drain1","drain2"])
     translate([
-        -drainBottomD/2 + bedWidth - bedWallThickness - drainWallSpacing - drainIntakeDistance,
+        bedWidth - drainTopD/2 - bedWallThickness - drainWallSpacing - drainIntakeDistance,
         drainIndex == "drain1"
             ? drainBottomD/2 + bedWallThickness + drainWallSpacing
             : bedDepth - drainBottomD/2 - bedWallThickness - drainWallSpacing,
@@ -122,14 +123,19 @@ union() {
         ])
         difference() {
             cylinder(d=intakeTopD, h = intakeTopHeight);
-            cylinder(d=intakeTopD - intakeTopThickness * 2, h = intakeTopHeight);
+            translate([
+                0,
+                0,
+                -epsilon
+            ])
+            cylinder(d=intakeTopD - intakeTopThickness * 2, h = intakeTopHeight + epsilon * 2);
         }
     }
 
     // Siphon drain tube
     for(drainIndex = ["drain1","drain2"])
     translate([
-        -drainTopD/2 + bedWidth - bedWallThickness - drainWallSpacing,
+        bedWidth - drainTopD/2 - bedWallThickness - drainWallSpacing,
         drainIndex == "drain1"
             ? drainBottomD/2 + bedWallThickness + drainWallSpacing
             : bedDepth - drainBottomD/2 - bedWallThickness - drainWallSpacing,
@@ -137,7 +143,12 @@ union() {
     ])
     difference() {
         cylinder(d=drainTopD, h = drainTopHeight);
-        cylinder(d=drainTopD - drainTopThickness * 2, h = drainTopHeight);
+        translate([
+            0,
+            0,
+            -epsilon
+        ])
+        cylinder(d=drainTopD - drainTopThickness * 2, h = drainTopHeight + epsilon * 2);
     }
 
     // Siphon filter
@@ -166,7 +177,7 @@ union() {
         cube([
             drainFilterWidth - drainFilterWallThickness,
             drainFilterDepth - drainFilterWallThickness,
-            drainFilterHeight
+            drainFilterHeight + epsilon
         ]);
 
         zNumberOfHoles = floor((drainFilterHeight - drainFilterWallThickness * 2 )/(drainFilterHoleSize * 2));
@@ -178,12 +189,12 @@ union() {
             for(xIndex = [0:xNumberOfHoles]) {
                 translate([
                     drainFilterWallThickness + drainFilterHoleSize * xIndex * 2,
-                    0,
+                    -epsilon,
                     drainFilterHoleSize * zIndex * 2,
                 ])
                 cube([
                     drainFilterHoleSize,
-                    drainFilterDepth,
+                    drainFilterDepth + epsilon * 2,
                     drainFilterHoleSize
                 ]);
             }
@@ -193,12 +204,12 @@ union() {
         for (zIndex = [0:zNumberOfHoles]) {
             for(yIndex = [0:yNumberOfHoles]) {
                 translate([
-                    0,
+                    -epsilon,
                     drainFilterWallThickness + drainFilterHoleSize * yIndex * 2,
                     drainFilterHoleSize * zIndex * 2,
                 ])
                 cube([
-                    drainFilterWidth,
+                    drainFilterWidth + epsilon * 2,
                     drainFilterHoleSize,
                     drainFilterHoleSize
                 ]);
@@ -251,7 +262,12 @@ union() {
         ])
         difference() {
             cylinder(d=intakeTopD, h = intakeTopHeight);
-            cylinder(d=intakeTopD - intakeTopThickness * 2, h = intakeTopHeight);
+            translate([
+                0,
+                0,
+                -epsilon
+            ])
+            cylinder(d=intakeTopD - intakeTopThickness * 2, h = intakeTopHeight + epsilon * 2);
         }
     }
 }
