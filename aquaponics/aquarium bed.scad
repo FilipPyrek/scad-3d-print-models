@@ -205,7 +205,11 @@ union() {
             for(yIndex = [0:yNumberOfHoles]) {
                 translate([
                     -epsilon,
-                    drainFilterWallThickness + drainFilterHoleSize * yIndex * 2,
+                    (
+                        drainIndex == "drain1"
+                            ? 0
+                            : drainFilterWallThickness
+                    ) + drainFilterHoleSize * yIndex * 2,
                     drainFilterHoleSize * zIndex * 2,
                 ])
                 cube([
