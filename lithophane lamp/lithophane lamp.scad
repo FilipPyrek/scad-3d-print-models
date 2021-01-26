@@ -1,5 +1,6 @@
 /* [Lithophane] */
-lithophaneDiameter = 114;
+lithophaneDiameter = 110;
+lithophaneMinThick = 1;
 lithophaneMaxThick = 3;
 lithophaneBorderThickness = 3;
 
@@ -17,7 +18,7 @@ objectsToRender = "top + bottom"; // [top + bottom, top, bottom]
 
 function calcSphereD(lithoD, lithoMaxThick) = lithoD + lithoMaxThick * 2;
 
-module cover(sphereHeight, coverHeight, lithoD, lithoMaxThick, lithoBorderThickness) {
+module cover(sphereHeight, coverHeight, lithoD, lithoMaxThick, lithoMinThick, lithoBorderThickness) {
 	sphereD = calcSphereD(lithoD, lithoMaxThick);
 
 	difference() {
@@ -55,7 +56,7 @@ module cover(sphereHeight, coverHeight, lithoD, lithoMaxThick, lithoBorderThickn
 			0,
 			-lithophaneBorderThickness
 		])
-		cylinder(h=lithophaneBorderThickness + epsilon, d = lithoD);
+		cylinder(h=lithophaneBorderThickness + epsilon, d = lithoD + 2 * lithoMinThick);
 		
 	}
 }
@@ -79,9 +80,9 @@ module cableHole(coverHeight, lithoD, lithoMaxThick, cableD) {
 	cylinder(h=sphereD/2, d=cableD);
 }
 
-module bottomCover(sphereHeight, coverHeight, lithoD, lithoMaxThick, lithoBorderThickness, cableD) {
+module bottomCover(sphereHeight, coverHeight, lithoD, lithoMaxThick, lithoMinThick, lithoBorderThickness, cableD) {
 	difference() {
-		cover(sphereHeight, coverHeight, lithoD, lithoMaxThick, lithoBorderThickness);
+		cover(sphereHeight, coverHeight, lithoD, lithoMaxThick, lithoMinThick, lithoBorderThickness);
 
 		if (enableCableHole == true) {
 			cableHole(coverHeight, lithoD, lithoMaxThick, cableD);
@@ -89,15 +90,15 @@ module bottomCover(sphereHeight, coverHeight, lithoD, lithoMaxThick, lithoBorder
 	}
 }
 
-module topCover(sphereHeight, coverHeight, lithoD, lithoMaxThick, lithoBorderThickness) {
-	cover(sphereHeight, coverHeight, lithoD, lithoMaxThick, lithoBorderThickness);
+module topCover(sphereHeight, coverHeight, lithoD, lithoMaxThick, lithoMinThick, lithoBorderThickness) {
+	cover(sphereHeight, coverHeight, lithoD, lithoMaxThick, lithoMinThick, lithoBorderThickness);
 }
 
 module renderCovers() {
 	sphereD = calcSphereD(lithophaneDiameter, lithophaneMaxThick);
 
 	if (objectsToRender != "bottom")
-	bottomCover(coverSphereHeight, coverHeight, lithophaneDiameter, lithophaneMaxThick, lithophaneBorderThickness, cableDiameter);
+	bottomCover(coverSphereHeight, coverHeight, lithophaneDiameter, lithophaneMaxThick, lithophaneMinThick, lithophaneBorderThickness, cableDiameter);
 
 	if (objectsToRender != "top")
 	translate([
@@ -105,7 +106,7 @@ module renderCovers() {
 		0,
 		0
 	])
-	topCover(coverSphereHeight, coverHeight, lithophaneDiameter, lithophaneMaxThick, lithophaneBorderThickness);
+	topCover(coverSphereHeight, coverHeight, lithophaneDiameter, lithophaneMaxThick, lithophaneMinThick, lithophaneBorderThickness);
 }
 
 
