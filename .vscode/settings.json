@@ -1,0 +1,7 @@
+{
+    "files.exclude": {
+        "**/*.stl": true,
+        "**/*.3mf": true,
+        "**/*.gcode": true
+    }
+}
