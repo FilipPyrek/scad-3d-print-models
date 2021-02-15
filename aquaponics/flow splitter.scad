@@ -12,8 +12,15 @@ outputAAngle = 45;
 
 outputBOuterD = 8;
 outputBInnerD = 6;
-outputBHeight = 10;
+outputBHeight = 15;
 outputBAngle = 45;
+
+oxOuterD = 4;
+oxInnerD = 3;
+oxHeight = 5;
+oxBreakD = outputBInnerD * 0.75;
+oxBreakOffset = outputBHeight * 0.2;
+oxBreakThickness = 1;
 
 module outputB(inner = false, socket = false) {
     translate([
@@ -28,6 +35,60 @@ module outputB(inner = false, socket = false) {
     ])
     cylinder(d=inner == true ? outputBInnerD : outputBOuterD, h = socket == true ? 1 : outputBHeight +  (inner == true ? epsilon : 0));
 } 
+
+module oxygen(inner = false) {
+    translate([
+        -cos(outputBAngle) * (outputBOuterD/2),
+        0,
+        inputOuterD
+    ])
+    rotate([
+        0,
+        -outputBAngle,
+        0
+    ])
+    translate([
+        0,
+        0,
+        oxBreakOffset
+    ])
+    union() {
+
+        difference() {
+            cylinder(d=outputBInnerD, h=oxBreakThickness);
+
+            translate([
+                0,
+                0,
+                -epsilon
+            ])
+            cylinder(d=oxBreakD, h=oxBreakThickness + epsilon * 2);
+        }
+
+        translate([
+            0,
+            -oxHeight/2 - (inner == true ? 0 : (outputBOuterD - outputBInnerD) / 2),
+            oxInnerD/2 + oxBreakThickness,
+        ])
+        rotate([
+            90,
+            0,
+            0
+        ])
+        difference() {
+            if (inner == false) {
+                cylinder(d=oxOuterD, h=oxHeight);
+            }
+
+            translate([
+                0,
+                0,
+                -epsilon
+            ])
+            cylinder(d=oxInnerD, h=oxHeight + epsilon * 2);
+        }
+    }
+}
 
 module outputA(inner = false, socket = false) {
     translate([
@@ -76,4 +137,8 @@ difference() {
 
     body(true);
     branches(true);
+
+    oxygen(true);
 }
+
+oxygen();
