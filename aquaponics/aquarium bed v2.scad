@@ -127,7 +127,7 @@ module intake() {
     translate([
         bedWallThickness,
         bedDepth / 2 - intakeWallWidth / 2,
-        bedHeight - bedWallThickness
+        bedHeight - intakeWallThickness
     ])
     cube([
         intakeWallThickness + intakeWallSpacing,
