@@ -5,7 +5,7 @@ printerMaxPartSize = 170;
 
 bedWidth = 500;
 bedDepth = 150;
-bedHeight = 30;
+bedHeight = 45;
 bedWallThickness = 2;
 
 intakeInnerD = 6;
@@ -23,7 +23,7 @@ drainHeight = 15;
 drainWallSpacing = 10;
 
 filterXCount = 5;
-filterYCount = 5;
+filterYCount = 8;
 filterTickness = filterXCount > filterYCount
         ? (bedDepth - bedWallThickness * 2) / (filterXCount * 2)
         : (bedHeight - bedWallThickness) / (filterYCount * 2);
@@ -270,17 +270,6 @@ module drain() {
                 ])
                 cylinder(d=drainInnerD, h=drainHeight * 2 + epsilon * 2);
             }
-
-            translate([
-                -pow(drainOuterD, 2)/2,
-                0,
-                -bedWallThickness/2 - pow(drainOuterD, 2) ,
-            ])
-            cube([
-                pow(drainOuterD, 2),
-                pow(drainOuterD, 2),
-                pow(drainOuterD, 2)
-            ]);
         }
     }
 }
