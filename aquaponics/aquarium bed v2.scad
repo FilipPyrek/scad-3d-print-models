@@ -16,9 +16,6 @@ intakeWallSpacing = 2;
 intakeWallWidth = intakeOuterD * 2;
 intakeWallThickness = 2;
 
-overflowHoleSize = 2;
-overflowHolesCount = 10;
-
 drainInnerD = 6;
 drainOuterD = 8;
 drainAngle = 45;
@@ -54,8 +51,6 @@ module bed() {
             bedDepth - bedWallThickness * 2,
             bedHeight - bedWallThickness + epsilon
         ]);
-
-        overflow();
 
         // intake
         translate([
@@ -158,22 +153,6 @@ module intake() {
     ]);
 }
 
-module overflow() {
-    for(i = [1:overflowHolesCount]) {
-    step = (bedMainPartWidth - intakeHeight) / (overflowHolesCount + 1) * i;
-
-    translate([
-        step,
-        -epsilon,
-        bedHeight - overflowHoleSize - bedWallThickness
-    ])
-    cube([
-        overflowHoleSize,
-        bedDepth + epsilon * 2,
-        overflowHoleSize
-    ]);
-    }
-}
 
 module flange() {
     if (flangeCount > 1) {
