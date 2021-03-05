@@ -18,7 +18,7 @@ outputBAngle = 45;
 oxOuterD = 4;
 oxInnerD = 3;
 oxHeight = 5;
-oxBreakD = outputBInnerD * 0.75;
+oxBreakD = outputBInnerD * 0.6;
 oxBreakOffset = outputBHeight * 0.2;
 oxBreakThickness = 1;
 
