@@ -1,18 +1,18 @@
 $fn = 100;
 epsilon = 1;
 
-inputOuterD = 8;
-inputInnerD = 6;
+inputOuterD = 14;
+inputInnerD = 12;
 inputHeight = 10;
 
 outputAOuterD = 8;
-outputAInnerD = 1;
+outputAInnerD = 1.5;
 outputAHeight = 10;
 outputAAngle = 45;
 
-outputBOuterD = 8;
-outputBInnerD = 6;
-outputBHeight = 15;
+outputBOuterD = 12;
+outputBInnerD = 10;
+outputBHeight = 20;
 outputBAngle = 45;
 
 oxOuterD = 4;
@@ -67,7 +67,7 @@ module oxygen(inner = false) {
 
         translate([
             0,
-            -oxHeight/2 - (inner == true ? 0 : (outputBOuterD - outputBInnerD) / 2),
+            -outputBOuterD/2 + (outputBOuterD - outputBInnerD) / 2,
             oxInnerD/2 + oxBreakThickness,
         ])
         rotate([
