@@ -17,11 +17,11 @@ intakeWallWidth = intakeOuterD * 2;
 intakeWallThickness = 2;
 
 drainWallThickness = bedWallThickness;
-drainInsideOuterD = 15;
-drainInsideInnerD = 5;
+drainInsideOuterD = 21;
+drainInsideInnerD = 7;
 drainInsideHeight = bedHeight * 0.5;
 
-drainOutsideOuterD = drainInsideOuterD * 1.75;
+drainOutsideOuterD = drainInsideOuterD * 1.65;
 drainOutsideInnerD = drainOutsideOuterD - drainWallThickness;
 drainOutsideHeight = drainInsideHeight * 1.1;
 
@@ -30,6 +30,12 @@ drainOutputHeight = bedHeight;
 
 drainOxIntakeSize = drainOutsideHeight - drainInsideHeight;
 drainOxIntakeWallSize = drainWallThickness / 2;
+
+filterInnerD = drainOutsideOuterD * 1.3;
+filterOuterD = filterInnerD  + bedWallThickness * 2;
+filterCountZ = 5;
+filterPillarWidth = 5;
+filterPillarCount = 4;
 
 bedMainPartWidth = bedWidth + intakeHeight;
 flangeCount = ceil(bedMainPartWidth / printerMaxPartSize);
@@ -337,8 +343,65 @@ module drain() {
     }
 }
 
-module filter() {
 
+module filter_circle(stepSize) {
+    difference() {
+        cylinder(d = filterOuterD, h = stepSize);
+
+        translate([
+            0,
+            0,
+            -epsilon
+        ])
+        cylinder(d = filterInnerD, h = stepSize + epsilon * 2);
+    }
+}
+module filter() {
+    translate([
+        bedWidth / 2,
+        bedDepth / 2,
+        bedWallThickness
+    ])
+    union() {
+        stepSize = (bedHeight - bedWallThickness) / (filterCountZ * 2);
+
+        for(i = [1:filterCountZ]) {
+            translate([
+                0,
+                0,
+                stepSize * 2 * i - stepSize
+            ])
+            filter_circle(stepSize);
+            
+            for(r = [0:180 / filterPillarCount:180]) {
+                intersection() {
+                    translate([
+                        0,
+                        0,
+                        stepSize * 2 * (i - 1)
+                    ])
+                    filter_circle(stepSize);
+
+                    rotate([
+                        0,
+                        0,
+                        r
+                    ])
+                    translate([
+                        -filterOuterD / 2,
+                        -filterPillarWidth / 2,
+                        0
+                    ])
+                    cube([
+                        filterOuterD,
+                        filterPillarWidth,
+                        bedHeight - bedWallThickness
+                    ]);
+                }
+            }
+        }
+
+    }
 }
 
 bed();
