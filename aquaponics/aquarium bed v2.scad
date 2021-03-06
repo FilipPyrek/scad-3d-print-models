@@ -5,7 +5,7 @@ printerMaxPartSize = 170;
 
 bedWidth = 500;
 bedDepth = 150;
-bedHeight = 45;
+bedHeight = 30;
 bedWallThickness = 2;
 
 intakeInnerD = 6;
@@ -16,21 +16,22 @@ intakeWallSpacing = 2;
 intakeWallWidth = intakeOuterD * 2;
 intakeWallThickness = 2;
 
-drainWidth = bedDepth / 3;
-drainIntakeDepth = drainWidth / 5;
-drainOutputDepth = drainIntakeDepth / 2;
-drainTreshold = bedHeight * 0.7;
 drainWallThickness = bedWallThickness;
+drainInsideInnerD = 10;
+drainInsideOuterD = drainInsideInnerD + drainWallThickness;
+drainInsideHeight = bedHeight * 0.6;
+
+drainOutsideInnerD = drainInsideInnerD * 2;
+drainOutsideOuterD = drainOutsideInnerD + drainWallThickness;
+drainOutsideHeight = drainInsideHeight * 1.1;
+
 drainIntakeHeight = bedHeight * 0.05;
-drainOutputHeight = bedHeight * 0.75;
+drainOutputHeight = bedHeight;
 
-filterXCount = 5;
-filterYCount = 8;
-filterTickness = filterXCount > filterYCount
-        ? (bedDepth - bedWallThickness * 2) / (filterXCount * 2)
-        : (bedHeight - bedWallThickness) / (filterYCount * 2);
+drainOxIntakeSize = drainOutsideHeight - drainInsideHeight;
+drainOxIntakeWallSize = drainWallThickness / 2;
 
-bedMainPartWidth = bedWidth + intakeHeight - drainIntakeDepth * 2 - drainOutputDepth - bedWallThickness;
+bedMainPartWidth = bedWidth + intakeHeight;
 flangeCount = ceil(bedMainPartWidth / printerMaxPartSize);
 flangeSize = bedHeight * 0.5;
 flangeThickness = 4;
@@ -69,17 +70,12 @@ module bed() {
 
         // drain
         translate([
-            bedWidth - bedWallThickness - epsilon,
-            bedDepth / 2 - drainWidth / 2 + bedWallThickness,
-            drainTreshold + bedWallThickness
+            bedWidth / 2,
+            bedDepth / 2,
+            -epsilon
         ])
-        cube([
-            bedWallThickness + epsilon * 2,
-            drainWidth - drainWallThickness * 2,
-            drainIntakeHeight
-        ]);
+        cylinder(d=drainInsideInnerD, h=bedWallThickness + epsilon * 2);
     }
-
 }
 
 module intake() {
@@ -175,35 +171,13 @@ module flange() {
             }
         }
     }
-
-    if (bedWidth + intakeHeight > printerMaxPartSize) {
-        for(side = ["near", "far"]) {
-            translate([
-                bedMainPartWidth - (flangeThickness / 2 * (side == "far" ? -1 : 1)) - intakeHeight - flangeThickness / 2,
-                (side == "far" ? bedDepth - bedWallThickness: bedWallThickness),
-                bedWallThickness
-            ])
-            rotate([
-                90,
-                0,
-                90 * (side == "far" ? -1 : 1)
-            ])
-            linear_extrude(height=flangeThickness)
-            {
-                polygon(
-                    points=[[0,0],[flangeSize,0],[0,flangeSize]],
-                    paths=[[0,1,2]]
-                );
-            }
-        }
-    }
 }
 
 module drain() {
     translate([
-        bedWidth - drainIntakeDepth - bedWallThickness,
-        bedDepth / 2 - drainWidth / 2,
-        0,
+        bedWidth / 2,
+        bedDepth / 2,
+        0
     ])
     union() {
         translate([
@@ -211,129 +185,151 @@ module drain() {
             0,
             bedWallThickness
         ])
-        difference() {
-            cube([
-                drainIntakeDepth,
-                drainWidth,
-                drainTreshold + drainIntakeHeight + drainWallThickness
-            ]);
+        union() {
+            difference() {
+                cylinder(d=drainInsideOuterD, h=drainOutsideHeight);
 
-            translate([
-                drainWallThickness,
-                drainWallThickness,
-                -epsilon
-            ])
-            cube([
-                drainIntakeDepth - drainWallThickness + epsilon,
-                drainWidth - drainWallThickness * 2,
-                drainTreshold  + drainIntakeHeight  + epsilon
-            ]);
+                translate([
+                    0,
+                    0,
+                    -epsilon
+                ])
+                cylinder(d=drainInsideInnerD, h=drainOutsideHeight + epsilon * 2);
             
-            translate([
-                -epsilon,
-                drainWallThickness,
-                -epsilon
-            ])
-            cube([
-                drainWallThickness + epsilon * 2,
-                drainWidth - drainWallThickness * 2,
-                drainIntakeHeight + epsilon
-            ]);
+                for(rotation = [0,90]){
+                    rotate([
+                        0,
+                        0,
+                        rotation
+                    ])
+                    translate([
+                        -drainInsideOuterD / 2,
+                        -drainInsideOuterD / 4,
+                        drainInsideHeight
+                    ])
+                    cube([
+                        drainInsideOuterD,
+                        drainInsideOuterD / 2,
+                        drainOutsideHeight - drainInsideHeight + epsilon
+                    ]);
+                }
 
+                
+            }
+           
+            difference() {
+                cylinder(d=drainOutsideOuterD, h=drainOutsideHeight);
+
+                translate([
+                    0,
+                    0,
+                    -epsilon
+                ])
+                cylinder(d=drainOutsideInnerD, h=drainOutsideHeight + epsilon * 2);
+            
+                for (rotation = [22.5,67.5,112.5,157.5]) {
+                    rotate([
+                        0,
+                        0,
+                        rotation
+                    ])
+                    translate([
+                        -drainOutsideOuterD / 4 / 2,
+                        -drainOutsideOuterD / 2,
+                        -epsilon
+                    ])
+                    cube([
+                        drainOutsideOuterD / 2 / 2,
+                        drainOutsideOuterD,
+                        drainIntakeHeight + epsilon
+                    ]);
+                }
+
+                // ox intake
+                translate([
+                    -drainOxIntakeSize / 2,
+                    -drainOutsideOuterD / 2 - epsilon,
+                    drainInsideHeight
+                ])
+                cube([
+                    drainOxIntakeSize,
+                    drainOxIntakeSize + epsilon,
+                    drainOxIntakeSize + epsilon
+                ]);
+            }
+
+            color("white", 0.25)
             translate([
-                -epsilon,
-                drainWidth / 2 - drainIntakeHeight / 2,
-                drainIntakeHeight + drainIntakeHeight / 2
+                0,
+                0,
+                drainOutsideHeight
             ])
-            cube([
-                drainWallThickness + epsilon * 2,
-                drainIntakeHeight,
-                drainIntakeHeight / 2
-            ]);
+            cylinder(d=drainOutsideOuterD, h = drainWallThickness);
+        
+            translate([
+                -drainOxIntakeSize / 2,
+                -drainOxIntakeSize - drainOutsideOuterD / 2 + (drainOutsideOuterD - drainOutsideInnerD) / 2 / 2,
+                drainInsideHeight
+            ])
+            union() {
+                difference() {
+                    
+                    translate([
+                        -drainOxIntakeWallSize,
+                        -drainOxIntakeWallSize,
+                        -drainOutsideHeight + drainOxIntakeSize + drainIntakeHeight * 1.5
+                    ])
+                    cube([
+                        drainOxIntakeSize + drainOxIntakeWallSize * 2,
+                        drainOxIntakeSize + drainOxIntakeWallSize,
+                        drainOutsideHeight - drainIntakeHeight * 1.5 + drainOxIntakeWallSize
+                    ]);
+
+                    translate([
+                        0,
+                        0,
+                        -drainOutsideHeight + drainOxIntakeSize + drainIntakeHeight * 1.5 - epsilon
+                    ])
+                    cube([
+                        drainOxIntakeSize,
+                        drainOxIntakeSize + epsilon,
+                        drainOutsideHeight - drainIntakeHeight * 1.5 + epsilon
+                    ]);
+                }
+
+                translate([
+                    -drainOxIntakeWallSize,
+                    -drainOxIntakeWallSize,
+                    -drainInsideHeight
+                ])
+                cube([
+                    drainOxIntakeSize + drainOxIntakeWallSize * 2,
+                    drainOxIntakeWallSize,
+                    drainIntakeHeight * 2
+                ]);
+            }
         }
 
         translate([
-            drainOutputDepth * 2 + bedWallThickness,
             0,
-            0
+            0,
+            -drainOutputHeight
         ])
-        union() {
-            difference() {
-                cube([
-                    drainOutputDepth,
-                    drainWidth,
-                    drainTreshold + drainIntakeHeight + drainWallThickness + bedWallThickness
-                ]);
-
-                translate([
-                    -epsilon,
-                    drainWallThickness,
-                    -epsilon
-                ])
-                cube([
-                    drainOutputDepth - drainWallThickness + epsilon,
-                    drainWidth - drainWallThickness * 2,
-                    drainTreshold  + drainIntakeHeight + bedWallThickness + epsilon
-                ]);
-            }
+        difference() {
+            cylinder(d=drainInsideOuterD, h=drainOutputHeight);
 
             translate([
-                -drainWallThickness,
                 0,
-                -drainOutputHeight
+                0,
+                -epsilon
             ])
-            difference() {
-                cube([
-                    drainOutputDepth + bedWallThickness,
-                    drainWidth,
-                    drainOutputHeight
-                ]);
-
-                translate([
-                    drainWallThickness,
-                    drainWallThickness,
-                    -epsilon
-                ])
-                cube([
-                    drainOutputDepth - drainWallThickness,
-                    drainWidth - drainWallThickness * 2,
-                    drainOutputHeight + epsilon * 2
-                ]);
-            }
+            cylinder(d=drainInsideInnerD, h=drainOutputHeight + epsilon * 2);
         }
     }
 }
 
 module filter() {
-    for(i = [1:filterYCount]) {
-        step = (bedHeight - bedWallThickness) / (filterYCount * 2) * i;
 
-        translate([
-            bedWidth - bedWallThickness - drainIntakeDepth * 2 - bedWallThickness,
-            bedWallThickness,
-            bedWallThickness + step + filterTickness * (i - 1)
-        ])
-        cube([
-            bedWallThickness,
-            bedDepth - bedWallThickness * 2,
-            filterTickness
-        ]);
-    }
-
-    for(i = [1:filterXCount]) {
-        step = (bedDepth - bedWallThickness * 2) / filterXCount  * i;
-
-        translate([
-            bedWidth - bedWallThickness - drainIntakeDepth * 2 - bedWallThickness,
-            bedWallThickness + step - filterTickness / 2 - (bedDepth - bedWallThickness * 2) / filterXCount / 2,
-            bedWallThickness 
-        ])
-        cube([
-            bedWallThickness,
-            filterTickness,
-            bedHeight - bedWallThickness
-        ]);
-    }
 }
 
 bed();
