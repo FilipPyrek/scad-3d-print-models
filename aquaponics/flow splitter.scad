@@ -6,7 +6,7 @@ inputInnerD = 12;
 inputHeight = 10;
 
 outputAOuterD = 8;
-outputAInnerD = 1.5;
+outputAInnerD = 2;
 outputAHeight = 10;
 outputAAngle = 45;
 
@@ -18,7 +18,7 @@ outputBAngle = 45;
 oxOuterD = 4;
 oxInnerD = 3;
 oxHeight = 5;
-oxBreakD = outputBInnerD * 0.6;
+oxBreakD = outputBInnerD * 0.7;
 oxBreakOffset = outputBHeight * 0.2;
 oxBreakThickness = 1;
 
