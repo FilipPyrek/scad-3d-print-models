@@ -151,7 +151,6 @@ module intake() {
     ]);
 }
 
-
 module flange() {
     if (flangeCount > 1) {
 
@@ -192,17 +191,12 @@ module drain() {
             bedWallThickness
         ])
         union() {
+            // inner drain
             difference() {
                 cylinder(d=drainInsideOuterD, h=drainOutsideHeight);
-
-                translate([
-                    0,
-                    0,
-                    -epsilon
-                ])
-                cylinder(d=drainInsideInnerD, h=epsilon * 2);
                 
                 hull() {
+                    translate([0,0,drainInsideHeight * 0.75])
                     cylinder(d=drainInsideInnerD, h=1);
 
                     translate([
@@ -212,7 +206,15 @@ module drain() {
                     ])
                     cylinder(d=drainInsideOuterD - drainWallThickness, h=drainOutsideHeight - drainInsideHeight + epsilon);
                 }
+
+                translate([
+                    0,
+                    0,
+                    -epsilon
+                ])
+                cylinder(d=drainInsideInnerD, h = drainInsideHeight * 0.75 + epsilon * 2);
                 
+                /// top intakes
                 for(rotation = [0,90]){
                     rotate([
                         0,
@@ -231,7 +233,8 @@ module drain() {
                     ]);
                 }
             }
-           
+
+            // outer cylinder
             difference() {
                 cylinder(d=drainOutsideOuterD, h=drainOutsideHeight);
 
@@ -242,6 +245,7 @@ module drain() {
                 ])
                 cylinder(d=drainOutsideInnerD, h=drainOutsideHeight + epsilon * 2);
             
+                // bottom intakes
                 for (rotation = [22.5,67.5,112.5,157.5]) {
                     rotate([
                         0,
@@ -262,17 +266,18 @@ module drain() {
 
                 // ox intake
                 translate([
-                    -drainOxIntakeSize / 2,
+                    -drainOutsideOuterD / 4 / 2,
                     -drainOutsideOuterD / 2 - epsilon,
                     drainInsideHeight
                 ])
                 cube([
-                    drainOxIntakeSize,
+                    drainOutsideOuterD / 4,
                     (drainOutsideOuterD - drainOutsideInnerD) / 2 + epsilon * 2,
                     drainOxIntakeSize + epsilon
                 ]);
             }
 
+            // cover
             color("white", 0.25)
             translate([
                 0,
@@ -281,50 +286,66 @@ module drain() {
             ])
             cylinder(d=drainOutsideOuterD, h = drainWallThickness);
         
+            // oxygen
             translate([
-                -drainOxIntakeSize / 2,
-                -drainOxIntakeSize - drainOutsideOuterD / 2 + (drainOutsideOuterD - drainOutsideInnerD) / 2 / 2,
+                -drainOutsideOuterD / 4 / 2,
+                -drainOxIntakeSize - drainOutsideOuterD / 2 + (drainOutsideOuterD - drainOutsideInnerD) / 2,
                 drainInsideHeight
             ])
             union() {
+                // tube
                 difference() {
-                    
                     translate([
                         -drainOxIntakeWallSize,
                         -drainOxIntakeWallSize,
-                        -drainOutsideHeight + drainOxIntakeSize + drainIntakeHeight * 1.5
+                        -drainOutsideHeight + drainOxIntakeSize + drainIntakeHeight * 3
                     ])
                     cube([
-                        drainOxIntakeSize + drainOxIntakeWallSize * 2,
+                        drainOutsideOuterD / 4 + drainOxIntakeWallSize * 2,
                         drainOxIntakeSize + drainOxIntakeWallSize,
-                        drainOutsideHeight - drainIntakeHeight * 1.5 + drainWallThickness
+                        drainOutsideHeight - drainIntakeHeight * 3 + drainWallThickness
                     ]);
 
                     translate([
                         0,
                         0,
-                        -drainOutsideHeight + drainOxIntakeSize + drainIntakeHeight * 1.5 - epsilon
+                        -drainOutsideHeight + drainOxIntakeSize + drainIntakeHeight * 3 - epsilon
                     ])
                     cube([
-                        drainOxIntakeSize,
+                        drainOutsideOuterD / 4,
                         drainOxIntakeSize + epsilon,
-                        drainOutsideHeight - drainIntakeHeight * 1.5 + epsilon
+                        drainOutsideHeight - drainIntakeHeight * 3 + epsilon
                     ]);
                 }
 
-                translate([
-                    -drainOxIntakeWallSize,
-                    -drainOxIntakeWallSize,
-                    -drainInsideHeight
-                ])
-                cube([
-                    drainOxIntakeSize + drainOxIntakeWallSize * 2,
-                    drainOxIntakeWallSize,
-                    drainIntakeHeight * 2
-                ]);
+                // bottom holder
+                difference() {
+                    translate([
+                        -drainOxIntakeWallSize,
+                        -drainOxIntakeWallSize,
+                        -drainInsideHeight
+                    ])
+                    cube([
+                        drainOutsideOuterD / 4 + drainOxIntakeWallSize * 2,
+                        drainOxIntakeWallSize,
+                        drainIntakeHeight * 3
+                    ]);
+
+                    translate([
+                        drainOutsideOuterD / 8 / 2,
+                        -drainOxIntakeWallSize - epsilon,
+                        -drainInsideHeight + drainIntakeHeight * 1.5
+                    ])
+                    cube([
+                        drainOutsideOuterD / 8,
+                        drainOxIntakeWallSize + epsilon * 2,
+                        drainIntakeHeight * 1.5
+                    ]);
+                }
             }
         }
 
+        // output
         translate([
             0,
             0,
@@ -342,7 +363,6 @@ module drain() {
         }
     }
 }
-
 
 module filter_circle(stepSize) {
     difference() {
