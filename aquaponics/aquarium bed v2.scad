@@ -19,13 +19,13 @@ intakeWallThickness = 2;
 drainWallThickness = bedWallThickness;
 drainInsideOuterD = 21;
 drainInsideInnerD = 7;
-drainInsideHeight = bedHeight * 0.5;
+drainInsideHeight = bedHeight * 0.4;
 
 drainOutsideOuterD = drainInsideOuterD * 1.65;
 drainOutsideInnerD = drainOutsideOuterD - drainWallThickness;
-drainOutsideHeight = drainInsideHeight * 1.1;
+drainOutsideHeight = drainInsideHeight * 1.2;
 
-drainIntakeHeight = bedHeight * 0.05;
+drainIntakeHeight = bedHeight * 0.1;
 drainOutputHeight = bedHeight;
 
 drainOxIntakeSize = drainOutsideHeight - drainInsideHeight;
@@ -298,50 +298,37 @@ module drain() {
                     translate([
                         -drainOxIntakeWallSize,
                         -drainOxIntakeWallSize,
-                        -drainOutsideHeight + drainOxIntakeSize + drainIntakeHeight * 3
+                        -drainOutsideHeight + drainOxIntakeSize + drainIntakeHeight * 1.5
                     ])
                     cube([
                         drainOutsideOuterD / 4 + drainOxIntakeWallSize * 2,
                         drainOxIntakeSize + drainOxIntakeWallSize,
-                        drainOutsideHeight - drainIntakeHeight * 3 + drainWallThickness
+                        drainOutsideHeight - drainIntakeHeight * 1.5 + drainWallThickness
                     ]);
 
                     translate([
                         0,
                         0,
-                        -drainOutsideHeight + drainOxIntakeSize + drainIntakeHeight * 3 - epsilon
+                        -drainOutsideHeight + drainOxIntakeSize + drainIntakeHeight * 1.5 - epsilon
                     ])
                     cube([
                         drainOutsideOuterD / 4,
                         drainOxIntakeSize + epsilon,
-                        drainOutsideHeight - drainIntakeHeight * 3 + epsilon
+                        drainOutsideHeight - drainIntakeHeight * 1.5 + epsilon
                     ]);
                 }
 
                 // bottom holder
-                difference() {
-                    translate([
-                        -drainOxIntakeWallSize,
-                        -drainOxIntakeWallSize,
-                        -drainInsideHeight
-                    ])
-                    cube([
-                        drainOutsideOuterD / 4 + drainOxIntakeWallSize * 2,
-                        drainOxIntakeWallSize,
-                        drainIntakeHeight * 3
-                    ]);
-
-                    translate([
-                        drainOutsideOuterD / 8 / 2,
-                        -drainOxIntakeWallSize - epsilon,
-                        -drainInsideHeight + drainIntakeHeight * 1.5
-                    ])
-                    cube([
-                        drainOutsideOuterD / 8,
-                        drainOxIntakeWallSize + epsilon * 2,
-                        drainIntakeHeight * 1.5
-                    ]);
-                }
+                translate([
+                    -drainOxIntakeWallSize,
+                    -drainOxIntakeWallSize,
+                    -drainInsideHeight
+                ])
+                cube([
+                    drainOutsideOuterD / 4 + drainOxIntakeWallSize * 2,
+                    drainOxIntakeWallSize,
+                    drainIntakeHeight * 1.5
+                ]);
             }
         }
 

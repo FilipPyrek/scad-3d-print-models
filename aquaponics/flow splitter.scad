@@ -6,7 +6,7 @@ inputInnerD = 12;
 inputHeight = 10;
 
 outputAOuterD = 8;
-outputAInnerD = 2;
+outputAInnerD = 3;
 outputAHeight = 10;
 outputAAngle = 45;
 
