@@ -37,10 +37,10 @@ filterCountZ = 5;
 filterPillarWidth = 5;
 filterPillarCount = 4;
 
-bedMainPartWidth = bedWidth + intakeHeight;
-flangeCount = ceil(bedMainPartWidth / printerMaxPartSize);
+flangeFilterAreaWidth = filterOuterD * 1.5;
 flangeSize = bedHeight * 0.5;
 flangeThickness = 4;
+
 
 module bed() {
     difference() {
@@ -152,12 +152,17 @@ module intake() {
 }
 
 module flange() {
-    if (flangeCount > 1) {
-
+    for(lr = ["left", "right"])
         for(side = ["near", "far"]) {
-            for(i = [1:flangeCount - 1]) {
+        partWidth = bedWidth / 2 - flangeFilterAreaWidth / 2 + (lr == "left" ? intakeHeight : 0);
+        partFlangeCount = ceil(partWidth / printerMaxPartSize);
+
+        if (partFlangeCount > 1)
+        for(i = [1:partFlangeCount - 1]) {
+            xOffset = partWidth / partFlangeCount * i + (lr == "left" ? 0 : bedWidth / 2 + flangeFilterAreaWidth / 2);
+
                 translate([
-                    bedMainPartWidth / flangeCount * i - (flangeThickness / 2 * (side == "far" ? -1 : 1)) - intakeHeight,
+                xOffset - (flangeThickness / 2 * (side == "far" ? -1 : 1)) - (lr == "left" ? intakeHeight : 0),
                     (side == "far" ? bedDepth - bedWallThickness: bedWallThickness),
                     bedWallThickness
                 ])
@@ -175,7 +180,30 @@ module flange() {
                 }
             }
         }
+        
+    
+    if(bedWidth + intakeHeight > printerMaxPartSize)
+    for(side = ["near", "far"]) 
+    for(i = ["left", "right"]) {
+        translate([
+            bedWidth / 2 + (flangeFilterAreaWidth / 2) * (i == "left" ? -1 : 1) - (flangeThickness / 2 * (side == "far" ? -1 : 1)),
+            (side == "far" ? bedDepth - bedWallThickness: bedWallThickness),
+            bedWallThickness
+        ])
+        rotate([
+            90,
+            0,
+            90 * (side == "far" ? -1 : 1)
+        ])
+        linear_extrude(height=flangeThickness)
+        {
+            polygon(
+                points=[[0,0],[flangeSize,0],[0,flangeSize]],
+                paths=[[0,1,2]]
+            );
+        }
     }
+    
 }
 
 module drain() {
