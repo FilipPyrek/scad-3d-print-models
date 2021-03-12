@@ -17,8 +17,8 @@ intakeWallWidth = intakeOuterD * 2;
 intakeWallThickness = 2;
 
 drainWallThickness = bedWallThickness;
-drainInsideOuterD = 21;
-drainInsideInnerD = 7;
+drainInsideOuterD = 13;
+drainInsideInnerD = 5;
 drainInsideHeight = bedHeight * 0.4;
 
 drainOutsideOuterD = drainInsideOuterD * 1.65;
@@ -317,7 +317,7 @@ module drain() {
             // oxygen
             translate([
                 -drainOutsideOuterD / 4 / 2,
-                -drainOxIntakeSize - drainOutsideOuterD / 2 + (drainOutsideOuterD - drainOutsideInnerD) / 2,
+                -drainOxIntakeSize - drainOutsideOuterD / 2 + (drainOutsideOuterD - drainOutsideInnerD) *0.5,
                 drainInsideHeight
             ])
             union() {
@@ -326,23 +326,23 @@ module drain() {
                     translate([
                         -drainOxIntakeWallSize,
                         -drainOxIntakeWallSize,
-                        -drainOutsideHeight + drainOxIntakeSize + drainIntakeHeight * 1.5
+                        -drainOutsideHeight + drainOxIntakeSize + drainIntakeHeight * 2
                     ])
                     cube([
                         drainOutsideOuterD / 4 + drainOxIntakeWallSize * 2,
                         drainOxIntakeSize + drainOxIntakeWallSize,
-                        drainOutsideHeight - drainIntakeHeight * 1.5 + drainWallThickness
+                        drainOutsideHeight - drainIntakeHeight * 2 + drainWallThickness
                     ]);
 
                     translate([
                         0,
                         0,
-                        -drainOutsideHeight + drainOxIntakeSize + drainIntakeHeight * 1.5 - epsilon
+                        -drainOutsideHeight + drainOxIntakeSize + drainIntakeHeight * 2 - epsilon
                     ])
                     cube([
                         drainOutsideOuterD / 4,
                         drainOxIntakeSize + epsilon,
-                        drainOutsideHeight - drainIntakeHeight * 1.5 + epsilon
+                        drainOutsideHeight - drainIntakeHeight * 2 + epsilon
                     ]);
                 }
 
@@ -355,7 +355,7 @@ module drain() {
                 cube([
                     drainOutsideOuterD / 4 + drainOxIntakeWallSize * 2,
                     drainOxIntakeWallSize,
-                    drainIntakeHeight * 1.5
+                    drainIntakeHeight * 2
                 ]);
             }
         }
